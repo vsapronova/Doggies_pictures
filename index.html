@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="styles.css" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+        <title>Doggies</title>
+    </head>
+    <body>
+        <div id="app">
+            <div>
+                <select v-model="selected_breed" @change="submit()" class="select-css">
+                    <option disabled selected value>Select a breed</option>
+                    <option v-for="breed in breeds">{{ breed }}</option>
+                </select>
+            </div>
+            <div id="images" v-for="image in images"> 
+                <img v-bind:src="image">
+            </div>
+            <div id="errors" v-for="error in errors">
+                {{ error }}
+            </div>
+        </div>
+
+    </body>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                selected_breed: '',
+                breeds: [],
+                images: [],
+                errors: []
+            },
+            created () {
+                fetch('https://dog.ceo/api/breeds/list/all')
+                .then(response => response.json())
+                .then(json => {
+                    this.breeds = Object.keys(json.message)
+
+                })
+            },
+            methods: {
+                submit() {
+                    this.errors = []
+                    if (this.selected_breed) {
+                        fetch("https://dog.ceo/api/breed/" + this.selected_breed + "/images/random/9")
+                        .then(response => {
+                            if (response.status === 200) {
+                                response.json()
+                                .then(json => {
+                                    this.images = json.message
+                                })
+                            } else {
+                                response.json()
+                                .then(json => {
+                                    this.errors.push(json.message)
+                                })
+                            }
+                        })
+                    } else {
+                        if(!this.selected_breed) this.errors.push("Require to select a breed.")
+                        
+                    }
+                }
+            }
+        })
+    </script>
+</html>
