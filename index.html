@@ -11,12 +11,15 @@
     <body>
         <div id="app">
              <div class="split left">
+                <h1>Select Breed</h1> 
                 <div id="breeds_tiles">
                     <div v-on:click="select($event)" class="tile" v-bind:data-breed="breed.name" v-for="breed in breeds">
                         <div class="caption">{{ breed.name }}</div>
                         <div class="item">
-                            <img class="item" v-bind:src="breed.image">
-                        </div>
+                            <img class="bg-card-photo" v-bind:src="breed.image"/>
+                            <div class="blur"></div>
+                            <img class="card-photo" v-bind:src="breed.image"/>
+                          </div>
                     </div>
                 </div>
             </div>
@@ -28,8 +31,11 @@
                         <option v-for="breed in subbreeds">{{ breed }}</option>
                     </select>
                 </div> -->
-                <div class="images">
-                    <img class="image" v-bind:src="image" v-for="image in images">
+                <div v-if="selected_breed">
+                    <h1>Photos of {{selected_breed.name}}</h1>
+                    <div class="images">
+                        <img class="image" v-bind:src="image" v-for="image in images">
+                    </div>
                 </div>
             </div>
         </div>    
@@ -38,7 +44,7 @@
         var app = new Vue({
             el: '#app',
             data: {
-                selected_breed: '',
+                selected_breed: null,
                 breeds: [],
                 images: [],
                 subbreeds: []
@@ -65,7 +71,8 @@
                 select: function(event) {
                     let breed_name = event.currentTarget.getAttribute("data-breed");
                     breed = this.breeds.find(breed => breed.name === breed_name)
-                    this.subbreeds = breed.subbreeds
+                    
+                    this.selected_breed = breed
 
                     fetch("https://dog.ceo/api/breed/" + breed_name + "/images/random/9")
                     .then(response => {
